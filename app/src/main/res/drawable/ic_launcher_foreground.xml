@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- halaman buku -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M38,26h32a6,6 0 0 1 6,6v44a6,6 0 0 1 -6,6h-32a6,6 0 0 1 -6,-6v-44a6,6 0 0 1 6,-6z" />
+    <!-- punggung buku -->
+    <path android:fillColor="#BBD6FA"
+        android:pathData="M38,26h2v56h-2a6,6 0 0 1 -6,-6v-44a6,6 0 0 1 6,-6z" />
+    <!-- garis catatan -->
+    <path android:fillColor="#1E6FD9"
+        android:pathData="M46,38h24v3h-24zM46,47h24v3h-24zM46,56h14v3h-14z" />
+    <!-- lencana centang -->
+    <path android:fillColor="#1E6FD9"
+        android:pathData="M68,58a14,14 0 1 1 0,28a14,14 0 1 1 0,-28z" />
+    <path android:fillColor="#FFB300"
+        android:pathData="M68,60.5a11.5,11.5 0 1 1 0,23a11.5,11.5 0 1 1 0,-23z" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3"
+        android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M62.5,72.5L66.5,76.5L74,68.5" />
+</vector>
