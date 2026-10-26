@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Catatan Sekolah</string>
+    <string name="tab_tugas">Tugas</string>
+    <string name="tab_jadwal">Jadwal</string>
+    <string-array name="hari">
+        <item>Senin</item>
+        <item>Selasa</item>
+        <item>Rabu</item>
+        <item>Kamis</item>
+        <item>Jumat</item>
+        <item>Sabtu</item>
+        <item>Minggu</item>
+    </string-array>
+</resources>
