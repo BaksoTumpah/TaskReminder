@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Catatan Sekolah</string>
+    <string name="app_name">Tugas</string>
     <string name="tab_tugas">Tugas</string>
     <string name="tab_jadwal">Jadwal</string>
     <string-array name="hari">

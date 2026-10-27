@@ -2,20 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="6dp"
-    android:background="?attr/selectableItemBackground"
+    android:layout_marginStart="2dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginEnd="2dp"
+    android:layout_marginBottom="5dp"
+    android:background="@drawable/bg_glass"
+    android:elevation="3dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:paddingStart="12dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="14dp">
 
     <CheckBox
         android:id="@+id/check"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:button="@drawable/sel_check"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingStart="0dp" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -23,23 +36,26 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/ink"
+            android:textSize="17sp" />
 
         <TextView
             android:id="@+id/sub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.7"
-            android:textSize="14sp" />
+            android:layout_marginTop="2dp"
+            android:textColor="@color/ink_sub"
+            android:textSize="13.5sp" />
     </LinearLayout>
 
     <ImageButton
         android:id="@+id/delete"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/bg_btn_icon"
         android:contentDescription="Hapus"
+        android:padding="9dp"
         android:src="@drawable/ic_delete"
-        android:tint="?android:attr/textColorSecondary" />
+        android:tint="@color/ink_sub" />
 </LinearLayout>

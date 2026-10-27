@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_top">#0A0E22</color>
+    <color name="bg_mid">#14112E</color>
+    <color name="bg_bottom">#1C0F28</color>
+    <color name="ink">#F2F4FF</color>
+    <color name="ink_sub">#A3ABC7</color>
+    <color name="nav_inactive">#A3ABC7</color>
+</resources>

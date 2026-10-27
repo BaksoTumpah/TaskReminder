@@ -4,6 +4,7 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
@@ -19,6 +20,26 @@ class ScheduleFragment : Fragment(R.layout.fragment_list) {
     private lateinit var adapter: RowAdapter<Lesson>
     private lateinit var empty: TextView
     private var data = mutableListOf<Lesson>()
+    private val listener: () -> Unit = { if (isAdded && view != null) refresh() }
+
+    override fun onStart() {
+        super.onStart()
+        Sync.onChanged = listener
+        refresh()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (Sync.onChanged === listener) Sync.onChanged = null
+    }
+
+    private fun blocked(): Boolean {
+        if (Sync.readOnly(requireContext())) {
+            Toast.makeText(requireContext(), "Token lihat saja: jadwal hanya bisa dilihat. Pakai token Admin untuk mengubah.", Toast.LENGTH_LONG).show()
+            return true
+        }
+        return false
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val rv = view.findViewById<RecyclerView>(R.id.list)
@@ -33,9 +54,17 @@ class ScheduleFragment : Fragment(R.layout.fragment_list) {
 
     private fun refresh() {
         data = Store.lessons(requireContext())
+        val prevCount = adapter.itemCount
         adapter.items = data.sortedWith(compareBy({ DAY_ORDER.indexOf(it.day) }, { it.start }))
+        val wasEmpty = prevCount == 0
         adapter.notifyDataSetChanged()
+        if (wasEmpty && data.isNotEmpty()) {
+            view?.findViewById<RecyclerView>(R.id.list)?.scheduleLayoutAnimation()
+        }
         empty.visibility = if (data.isEmpty()) View.VISIBLE else View.GONE
+        view?.findViewById<FloatingActionButton>(R.id.fab)?.let {
+            if (Sync.readOnly(requireContext())) it.hide() else it.show()
+        }
     }
 
     private fun bindRow(v: View, l: Lesson) {
@@ -48,12 +77,15 @@ class ScheduleFragment : Fragment(R.layout.fragment_list) {
     }
 
     private fun confirmDelete(l: Lesson) {
+        if (blocked()) return
         AlertDialog.Builder(requireContext())
             .setTitle("Hapus jadwal?")
             .setMessage("“${l.subject}” akan dihapus dari jadwal.")
             .setPositiveButton("Hapus") { _, _ ->
                 data.removeAll { it.id == l.id }
                 Store.saveLessons(requireContext(), data)
+                Store.addTomb(requireContext(), "lessons", l.id)
+                Sync.scheduleSync(requireContext())
                 refresh()
             }
             .setNegativeButton("Batal", null)
@@ -61,6 +93,7 @@ class ScheduleFragment : Fragment(R.layout.fragment_list) {
     }
 
     private fun showDialog(existing: Lesson?) {
+        if (blocked()) return
         val v = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_lesson, null)
         val spDay = v.findViewById<Spinner>(R.id.spDay)
         val etSubject = v.findViewById<EditText>(R.id.etSubject)
@@ -99,8 +132,10 @@ class ScheduleFragment : Fragment(R.layout.fragment_list) {
                 l.room = etRoom.text.toString().trim()
                 l.start = start
                 l.end = end
+                l.u = System.currentTimeMillis()
                 if (existing == null) data.add(l)
                 Store.saveLessons(requireContext(), data)
+                Sync.scheduleSync(requireContext())
                 refresh()
             }
             .setNegativeButton("Batal", null)

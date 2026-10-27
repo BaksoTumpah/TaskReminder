@@ -1,4 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_sync" android:showAsAction="never" android:title="Sambungkan Kas Kelas" />
     <item android:id="@+id/menu_test" android:showAsAction="never" android:title="Tes notifikasi" />
     <item android:id="@+id/menu_settings" android:showAsAction="never" android:title="Pengaturan notifikasi" />
+    <item android:id="@+id/menu_about" android:showAsAction="never" android:title="Tentang" />
 </menu>

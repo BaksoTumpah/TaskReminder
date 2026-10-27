@@ -1,8 +1,77 @@
 <resources>
-    <style name="Theme.Catatan" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="colorPrimary">#1E6FD9</item>
-        <item name="colorPrimaryVariant">#1457AD</item>
-        <item name="colorSecondary">#1E6FD9</item>
+    <style name="Theme.Catatan" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryVariant">#0060D0</item>
+        <item name="colorSecondary">@color/accent2</item>
         <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:windowBackground">@drawable/bg_app</item>
+        <item name="android:statusBarColor">@color/bg_top</item>
+        <item name="android:windowLightStatusBar">@bool/light_bars</item>
+        <item name="android:textColorPrimary">@color/ink</item>
+        <item name="android:textColorSecondary">@color/ink_sub</item>
+        <item name="alertDialogTheme">@style/App.Alert</item>
+        <item name="android:windowAnimationStyle">@style/App.WindowAnim</item>
+    </style>
+
+    <style name="App.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowAnimationStyle">@style/App.DialogAnim</item>
+        <item name="android:textColorPrimary">@color/ink</item>
+        <item name="android:textColorSecondary">@color/ink_sub</item>
+        <item name="colorPrimary">@color/accent</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.MaterialComponents.Button.TextButton.Dialog</item>
+    </style>
+
+    <style name="App.WindowAnim" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/fade_out</item>
+    </style>
+
+    <style name="App.DialogAnim" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/dialog_out</item>
+    </style>
+
+    <style name="App.Title">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="App.Input">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:background">@drawable/bg_input</item>
+        <item name="android:padding">14dp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textColorHint">@color/ink_sub</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="App.PopupItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="App.PopupDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:background">#2278829F</item>
+    </style>
+
+    <style name="App.PopupAnim">
+        <item name="android:windowEnterAnimation">@anim/popup_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
     </style>
 </resources>

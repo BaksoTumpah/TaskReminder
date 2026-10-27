@@ -11,7 +11,8 @@ data class Task(
     var subject: String,
     var dueDate: Long, // milidetik, awal hari deadline
     var notes: String,
-    var done: Boolean
+    var done: Boolean,
+    var u: Long = 0 // stempel perubahan terakhir (ms), dipakai sinkron dengan Kas Kelas
 )
 
 data class Lesson(
@@ -20,7 +21,8 @@ data class Lesson(
     var subject: String,
     var start: String, // "HH:mm"
     var end: String,
-    var room: String
+    var room: String,
+    var u: Long = 0
 )
 
 val DAY_ORDER = intArrayOf(
@@ -32,6 +34,9 @@ val DAY_NAMES = arrayOf("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "M
 fun dayName(day: Int): String = DAY_NAMES[DAY_ORDER.indexOf(day).coerceAtLeast(0)]
 
 object Store {
+    /** Naik tiap ada perubahan lokal; Sync memakainya untuk mendeteksi perubahan saat permintaan berjalan. */
+    @Volatile var rev: Long = 0
+
     private fun prefs(c: Context) = c.getSharedPreferences("data", Context.MODE_PRIVATE)
 
     fun tasks(c: Context): MutableList<Task> {
@@ -43,7 +48,7 @@ object Store {
                 out.add(
                     Task(
                         o.getLong("id"), o.getString("title"), o.optString("subject"),
-                        o.getLong("dueDate"), o.optString("notes"), o.optBoolean("done")
+                        o.getLong("dueDate"), o.optString("notes"), o.optBoolean("done"), o.optLong("u", 0)
                     )
                 )
             }
@@ -52,15 +57,16 @@ object Store {
         return out
     }
 
-    fun saveTasks(c: Context, list: List<Task>) {
+    fun saveTasks(c: Context, list: List<Task>, silent: Boolean = false) {
         val arr = JSONArray()
         list.forEach {
             arr.put(
                 JSONObject().put("id", it.id).put("title", it.title).put("subject", it.subject)
-                    .put("dueDate", it.dueDate).put("notes", it.notes).put("done", it.done)
+                    .put("dueDate", it.dueDate).put("notes", it.notes).put("done", it.done).put("u", it.u)
             )
         }
         prefs(c).edit().putString("tasks", arr.toString()).apply()
+        if (!silent) rev++
     }
 
     fun lessons(c: Context): MutableList<Lesson> {
@@ -72,7 +78,7 @@ object Store {
                 out.add(
                     Lesson(
                         o.getLong("id"), o.getInt("day"), o.getString("subject"),
-                        o.getString("start"), o.getString("end"), o.optString("room")
+                        o.getString("start"), o.getString("end"), o.optString("room"), o.optLong("u", 0)
                     )
                 )
             }
@@ -81,14 +87,43 @@ object Store {
         return out
     }
 
-    fun saveLessons(c: Context, list: List<Lesson>) {
+    fun saveLessons(c: Context, list: List<Lesson>, silent: Boolean = false) {
         val arr = JSONArray()
         list.forEach {
             arr.put(
                 JSONObject().put("id", it.id).put("day", it.day).put("subject", it.subject)
-                    .put("start", it.start).put("end", it.end).put("room", it.room)
+                    .put("start", it.start).put("end", it.end).put("room", it.room).put("u", it.u)
             )
         }
         prefs(c).edit().putString("lessons", arr.toString()).apply()
+        if (!silent) rev++
+    }
+
+    /** Tanda hapus (id -> waktu hapus) untuk kind "tasks" atau "lessons"; dikirim ke server agar item tidak hidup lagi. */
+    fun tombs(c: Context, kind: String): MutableMap<Long, Long> {
+        val out = mutableMapOf<Long, Long>()
+        try {
+            val o = JSONObject(prefs(c).getString("del_$kind", "{}") ?: "{}")
+            val keys = o.keys()
+            while (keys.hasNext()) {
+                val k = keys.next()
+                out[k.toLong()] = o.optLong(k, 0)
+            }
+        } catch (_: Exception) {
+        }
+        return out
+    }
+
+    fun saveTombs(c: Context, kind: String, m: Map<Long, Long>, silent: Boolean = false) {
+        val o = JSONObject()
+        for ((k, v) in m) o.put(k.toString(), v)
+        prefs(c).edit().putString("del_$kind", o.toString()).apply()
+        if (!silent) rev++
+    }
+
+    fun addTomb(c: Context, kind: String, id: Long) {
+        val m = tombs(c, kind)
+        m[id] = System.currentTimeMillis()
+        saveTombs(c, kind, m)
     }
 }

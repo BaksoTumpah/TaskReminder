@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -24,6 +25,26 @@ class TaskFragment : Fragment(R.layout.fragment_list) {
     private lateinit var empty: TextView
     private var data = mutableListOf<Task>()
     private val fmt = SimpleDateFormat("EEE, d MMM yyyy", Locale("id", "ID"))
+    private val listener: () -> Unit = { if (isAdded && view != null) refresh() }
+
+    override fun onStart() {
+        super.onStart()
+        Sync.onChanged = listener
+        refresh()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (Sync.onChanged === listener) Sync.onChanged = null
+    }
+
+    private fun blocked(): Boolean {
+        if (Sync.readOnly(requireContext())) {
+            Toast.makeText(requireContext(), "Token lihat saja: tugas hanya bisa dilihat. Pakai token Admin untuk mengubah.", Toast.LENGTH_LONG).show()
+            return true
+        }
+        return false
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val rv = view.findViewById<RecyclerView>(R.id.list)
@@ -38,9 +59,17 @@ class TaskFragment : Fragment(R.layout.fragment_list) {
 
     private fun refresh() {
         data = Store.tasks(requireContext())
+        val prevCount = adapter.itemCount
         adapter.items = data.sortedWith(compareBy({ it.done }, { it.dueDate }))
+        val wasEmpty = prevCount == 0
         adapter.notifyDataSetChanged()
+        if (wasEmpty && data.isNotEmpty()) {
+            view?.findViewById<RecyclerView>(R.id.list)?.scheduleLayoutAnimation()
+        }
         empty.visibility = if (data.isEmpty()) View.VISIBLE else View.GONE
+        view?.findViewById<FloatingActionButton>(R.id.fab)?.let {
+            if (Sync.readOnly(requireContext())) it.hide() else it.show()
+        }
     }
 
     private fun bindRow(v: View, t: Task) {
@@ -56,15 +85,19 @@ class TaskFragment : Fragment(R.layout.fragment_list) {
             else title.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         check.setOnCheckedChangeListener(null)
         check.isChecked = t.done
+        check.isEnabled = !Sync.readOnly(requireContext())
         check.setOnCheckedChangeListener { _, checked ->
             t.done = checked
+            t.u = System.currentTimeMillis()
             Store.saveTasks(requireContext(), data)
             Scheduler.scheduleTask(requireContext(), t)
+            Sync.scheduleSync(requireContext())
             view?.post { refresh() }
         }
     }
 
     private fun confirmDelete(t: Task) {
+        if (blocked()) return
         AlertDialog.Builder(requireContext())
             .setTitle("Hapus tugas?")
             .setMessage("“${t.title}” akan dihapus dan pengingatnya dibatalkan.")
@@ -72,6 +105,8 @@ class TaskFragment : Fragment(R.layout.fragment_list) {
                 Scheduler.cancelTask(requireContext(), t)
                 data.removeAll { it.id == t.id }
                 Store.saveTasks(requireContext(), data)
+                Store.addTomb(requireContext(), "tasks", t.id)
+                Sync.scheduleSync(requireContext())
                 refresh()
             }
             .setNegativeButton("Batal", null)
@@ -79,6 +114,7 @@ class TaskFragment : Fragment(R.layout.fragment_list) {
     }
 
     private fun showDialog(existing: Task?) {
+        if (blocked()) return
         val v = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_task, null)
         val etTitle = v.findViewById<EditText>(R.id.etTitle)
         val etSubject = v.findViewById<EditText>(R.id.etSubject)
@@ -116,9 +152,11 @@ class TaskFragment : Fragment(R.layout.fragment_list) {
                 t.subject = etSubject.text.toString().trim()
                 t.notes = etNotes.text.toString().trim()
                 t.dueDate = due
+                t.u = System.currentTimeMillis()
                 if (existing == null) data.add(t)
                 Store.saveTasks(requireContext(), data)
                 Scheduler.scheduleTask(requireContext(), t)
+                Sync.scheduleSync(requireContext())
                 refresh()
             }
             .setNegativeButton("Batal", null)

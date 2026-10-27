@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:paddingStart="22dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="4dp">
 
-    <EditText android:id="@+id/etTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <EditText android:id="@+id/etTitle" style="@style/App.Input"
         android:hint="Judul tugas" android:inputType="textCapSentences" />
-    <EditText android:id="@+id/etSubject" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <EditText android:id="@+id/etSubject" style="@style/App.Input"
         android:hint="Mata pelajaran" android:inputType="textCapWords" />
-    <EditText android:id="@+id/etNotes" android:layout_width="match_parent" android:layout_height="wrap_content"
+    <EditText android:id="@+id/etNotes" style="@style/App.Input"
         android:hint="Catatan (opsional)" android:inputType="textMultiLine|textCapSentences" />
-    <Button android:id="@+id/btnDate" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="Pilih tanggal deadline" />
+    <Button android:id="@+id/btnDate" style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="6dp" android:text="Pilih tanggal deadline"
+        android:textAllCaps="false" app:cornerRadius="16dp" />
 </LinearLayout>
