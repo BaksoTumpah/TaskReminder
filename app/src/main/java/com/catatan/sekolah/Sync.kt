@@ -14,7 +14,7 @@ import java.util.Locale
 /**
  * Sinkron tugas + jadwal dengan Kas Kelas (website + bot) lewat Cloudflare Worker.
  * Data digabung di server per item: versi dengan stempel `u` terbaru menang; penghapusan memakai tanda hapus.
- * Token Admin (editor) boleh mengubah; token lihat-saja hanya membaca (data lokal mengikuti data kelas).
+ * Token Admin (editor) dan Admin Kelas (staff) boleh mengubah; token lihat-saja hanya membaca (data lokal mengikuti data kelas).
  */
 object Sync {
     private const val RELAY_URL = "https://icy-truth-bbad.fadilataufan14.workers.dev/"
@@ -44,11 +44,11 @@ object Sync {
     fun connected(c: Context): Boolean = token(c).isNotEmpty()
 
     /** Terhubung dengan token lihat-saja: tugas dan jadwal hanya bisa dilihat. */
-    fun readOnly(c: Context): Boolean = connected(c) && role(c) != "editor"
+    fun readOnly(c: Context): Boolean = connected(c) && role(c) != "editor" && role(c) != "staff"
 
     fun statusText(c: Context): String {
         if (!connected(c)) return "Belum tersambung ke Kas Kelas"
-        val r = if (role(c) == "editor") "Admin" else "Lihat saja"
+        val r = when (role(c)) { "editor" -> "Admin"; "staff" -> "Admin Kelas"; else -> "Lihat saja" }
         return if (lastStatus.isNotEmpty()) "Kas Kelas ($r) • $lastStatus" else "Kas Kelas ($r)"
     }
 

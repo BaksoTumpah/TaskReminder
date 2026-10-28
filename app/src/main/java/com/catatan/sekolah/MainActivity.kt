@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         }
         AlertDialog.Builder(this)
             .setTitle("Sambungkan ke Kas Kelas")
-            .setMessage("Masukkan token Kas Kelas. Token Admin bisa mengubah tugas & jadwal; token pengguna hanya melihat.")
+            .setMessage("Masukkan token Kas Kelas. Token Admin dan Admin Kelas bisa mengubah tugas & jadwal; token pengguna hanya melihat.")
             .setView(et)
             .setPositiveButton("Sambungkan") { _, _ ->
                 val t = et.text.toString().trim().uppercase()
@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
                 toast("Memeriksa token…")
                 Sync.probe(this, t) { role, err ->
                     if (role == null) toast(err)
-                    else if (role == "editor") finishConnect(t, role)
+                    else if (role == "editor" || role == "staff") finishConnect(t, role)
                     else AlertDialog.Builder(this)
                         .setTitle("Token lihat saja")
                         .setMessage("Dengan token ini data tugas & jadwal di HP akan DIGANTI dengan data kelas dan tidak bisa diubah dari aplikasi. Lanjutkan?")
@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun finishConnect(token: String, role: String) {
-        if (role != "editor") {
+        if (role != "editor" && role != "staff") {
             for (t in Store.tasks(this)) Scheduler.cancelTask(this, t)
             Store.saveTasks(this, mutableListOf(), true)
             Store.saveLessons(this, mutableListOf(), true)
